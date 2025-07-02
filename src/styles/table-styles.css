@@ -1,0 +1,180 @@
+:root {
+  /* Основные цвета */
+  --color-white: #ffffff;
+  --color-black: #333333;
+  --color-light-gray: #f5f5f5;
+  --color-gray: #e4e4e4;
+  --color-dark-gray: #e0e0e0;
+  --color-blue: #1e41ff;
+  --color-light-blue: #eaf2ff;
+  --color-hover: #f9f9f9;
+  
+  /* Размеры */
+  --table-min-width: 1440px;
+  --column-main-width: 200px;
+  --column-data-width: 50px;
+  --border-radius: 14px;
+  --border-width: 1px;
+  --border-accent-width: 5px;
+  
+  /* Отступы */
+  --padding-small: 6px 8px;
+  --padding-medium: 8px 8px;
+  --padding-large: 10px 8px;
+  --padding-extra: 16px;
+  
+  /* Шрифты */
+  --font-weight-normal: 600;
+  --font-weight-bold: 650;
+  --font-weight-header: 700;
+}
+
+/* Общие стили таблицы */
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  margin-top: var(--padding-extra);
+}
+
+table {
+  min-width: var(--table-min-width);
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: var(--color-white);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  table-layout: fixed;
+}
+
+/* Стили шапки таблицы */
+thead {
+  background-color: var(--color-white);
+}
+
+thead tr {
+  background-color: var(--color-white);
+}
+
+thead th {
+  padding: var(--padding-large);
+  text-align: left;
+  font-weight: var(--font-weight-header);
+  color: var(--color-black);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Стили тела таблицы */
+tbody td {
+  padding: var(--padding-medium);
+  border-bottom: var(--border-width) solid var(--color-dark-gray);
+  vertical-align: middle;
+}
+
+/* Ширина колонок */
+td:first-child,
+th:first-child {
+  width: var(--column-main-width);
+  min-width: var(--column-main-width);
+  padding-left: var(--padding-extra);
+}
+
+td:not(:first-child),
+th:not(:first-child) {
+  width: var(--column-data-width);
+  min-width: var(--column-data-width);
+  max-width: var(--column-data-width);
+  text-align: left;
+}
+
+/* Стили отделов */
+.main-department {
+  background-color: var(--color-light-blue);
+}
+
+.main-department td {
+  background-color: inherit;
+  cursor: pointer;
+  border: none;
+  font-weight: var(--font-weight-bold);
+  padding: var(--padding-medium);
+}
+
+.top-level td:first-child {
+  border-left: var(--border-accent-width) solid var(--color-blue);
+}
+
+.sub-department {
+  background-color: var(--color-light-gray);
+}
+
+.sub-department td {
+  background-color: inherit;
+  padding-left: 30px;
+  cursor: pointer;
+  border: none;
+  font-weight: var(--font-weight-normal);
+  border-bottom: var(--border-width) solid var(--color-gray);
+}
+
+/* Стили сотрудников */
+.employee td,
+.employee-nested td {
+  padding: var(--padding-medium);
+  text-align: left;
+  font-weight: var(--font-weight-normal);
+  background-color: var(--color-white);
+  border-bottom: var(--border-width) solid var(--color-gray);
+  cursor: pointer;
+}
+
+.name-indent {
+  padding-left: 24px;
+}
+
+.employee-nested .name-indent {
+  padding-left: 46px;
+}
+
+/* Элементы интерфейса */
+.cell-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.toggle-icon.rotated {
+  transform: rotate(90deg);
+}
+
+/* Состояния */
+.hidden {
+  display: none;
+}
+
+/* Дополнительные улучшения */
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--color-hover);
+}
+
+/* Контейнер и разделитель */
+.container {
+  padding: var(--padding-extra);
+}
+
+hr {
+  margin: var(--padding-extra) 0;
+  border: none;
+  border-top: var(--border-width) solid var(--color-dark-gray);
+}
