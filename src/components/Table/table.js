@@ -61,19 +61,16 @@ export function renderTable(containerId = "table-wrapper") {
     const thead = document.createElement("thead");
     const tr = document.createElement("tr");
 
-    // Первый столбец — Имя
     const nameTh = document.createElement("th");
     nameTh.textContent = "Имя";
     tr.appendChild(nameTh);
 
-    // Столбцы по дням
     for (let i = 1; i <= dayCount; i++) {
       const th = document.createElement("th");
       th.textContent = i.toString();
       tr.appendChild(th);
     }
 
-    // Последний столбец — Итог
     const totalTh = document.createElement("th");
     totalTh.textContent = "Итог";
     tr.appendChild(totalTh);
@@ -82,20 +79,16 @@ export function renderTable(containerId = "table-wrapper") {
     return thead;
   }
 
-  // Этап 2: Генерация заголовка
-  const dayCount = 15; // Пока 15 дней по умолчанию
+  const dayCount = 15;
   const theadElement = createThead(dayCount);
   table.appendChild(theadElement);
 
-  // Этап 3: Пустое тело таблицы (позже добавим строки сотрудников)
   const tbody = document.createElement("tbody");
   table.appendChild(tbody);
 
-  // Этап 4: Очистка и вставка в контейнер
   container.innerHTML = "";
   container.appendChild(table);
 
-  // Этап 5: Добавления иконки выпадающегося списка
   function createToggleIcon() {
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
@@ -116,9 +109,6 @@ export function renderTable(containerId = "table-wrapper") {
     return svg;
   }
 
-  // Этап 6: Формирование отделов
-
-  // Создаём строку отдела (уровень вложенности задаёт класс)
   function createDepartmentRow(dept, level, parentId) {
     const tr = document.createElement("tr");
 
@@ -127,7 +117,7 @@ export function renderTable(containerId = "table-wrapper") {
     } else if (level === 1) {
       tr.className = "sub-department";
     } else {
-      tr.className = "sub-sub-department"; // можно добавить стили для 3+ уровня
+      tr.className = "sub-sub-department";
     }
 
     tr.dataset.toggle = dept.toggleId;
@@ -144,7 +134,6 @@ export function renderTable(containerId = "table-wrapper") {
     div.appendChild(createToggleIcon());
     div.append(dept.name);
 
-    // Добавляем отступ по уровню
     div.style.paddingLeft = `${level * 20}px`;
 
     td.appendChild(div);
@@ -153,11 +142,9 @@ export function renderTable(containerId = "table-wrapper") {
     return tr;
   }
 
-  // Создаём строку сотрудника
   function createEmployeeRow(employee, parentId, level) {
     const tr = document.createElement("tr");
 
-    // Классы для сотрудников в зависимости от уровня вложенности
     if (level === 0) {
       tr.className = "employee";
     } else {
@@ -173,7 +160,6 @@ export function renderTable(containerId = "table-wrapper") {
     div.className = "name-indent";
     div.textContent = employee.name;
 
-    // Отступ для сотрудников
     div.style.paddingLeft = `${(level + 1) * 30}px`;
 
     tdName.appendChild(div);
@@ -187,13 +173,12 @@ export function renderTable(containerId = "table-wrapper") {
     }
 
     const tdTotal = document.createElement("td");
-    tdTotal.textContent = "Итог"; // сюда потом можно сумму поставить
+    tdTotal.textContent = "Итог";
     tr.appendChild(tdTotal);
 
     return tr;
   }
 
-  // Рекурсивно рендерим отделы и сотрудников
   function renderDepartments(depts, parentId = null, level = 0) {
     for (const dept of depts) {
       tbody.appendChild(createDepartmentRow(dept, level, parentId));
