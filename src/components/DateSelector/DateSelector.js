@@ -8,7 +8,7 @@ function renderDateSelector() {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
-
+    // test
     const html = `
     <h2>Выберите месяц и год:</h2>
     <div class="date-controls">

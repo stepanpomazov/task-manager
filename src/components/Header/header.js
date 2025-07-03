@@ -32,7 +32,7 @@ monthSelect.appendChild(option);
 });
 
 monthGroup.appendChild(monthSelect);
-
+// test
 const yearGroup = document.createElement('label');
 yearGroup.textContent = 'Год';
 const yearInput = document.createElement('input');
