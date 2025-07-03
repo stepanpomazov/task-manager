@@ -109,3 +109,67 @@
     font-size: 13px;
   }
 }
+
+/* Стили для иерархического списка отделов */
+#departments {
+
+  min-width: 280px;
+  padding: 8px 15px;
+  border-radius: 15px;
+  border: none;
+  color: #000000;
+  background-color: #f3f3f3;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+
+#departments option {
+  padding: 6px 10px;
+  margin: 2px 0;
+  border-radius: 4px;
+}
+
+/* Иерархические уровни */
+#departments option.level-1 { padding-left: 20px; }
+#departments option.level-2 { padding-left: 40px; }
+#departments option.level-3 { padding-left: 60px; }
+
+/* Стили для элементов с подотделами */
+#departments option.has-children {
+  background-color: #f0f0f0;
+  margin-bottom: 2px;
+}
+
+#departments option:hover {
+  background-color: #e0e0e0;
+}
+
+/* Минималистичные стрелки */
+#departments option.has-children::before {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #555;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  #departments {
+    min-width: 200px;
+    font-size: 13px;
+  }
+
+  #departments option.level-1 { padding-left: 15px; }
+  #departments option.level-2 { padding-left: 30px; }
+  #departments option.level-3 { padding-left: 45px; }
+}

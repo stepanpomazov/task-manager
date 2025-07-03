@@ -15,103 +15,142 @@ export async function renderHeader(containerId = 'header-container') {
     const formRow = document.createElement('div');
     formRow.className = 'form-row';
 
-    // Блок месяца (оставляем без изменений)
-    const monthGroup = document.createElement('label');
-    monthGroup.textContent = 'Месяц';
-    const monthSelect = document.createElement('select');
-    monthSelect.id = 'monthSelect';
-    monthSelect.name = 'month';
+    // 1. Блок месяца
+    const monthGroup = document.createElement('div');
+    monthGroup.className = 'form-group';
+    monthGroup.innerHTML = `
+        <label>Месяц</label>
+        <select id="monthSelect">
+            ${["Январь","Февраль","Март","Апрель","Май","Июнь",
+        "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
+        .map((month, index) => `<option value="${index + 1}">${month}</option>`)
+        .join('')}
+        </select>
+    `;
 
-    const months = [
-        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
-    ];
+    // 2. Блок года
+    const yearGroup = document.createElement('div');
+    yearGroup.className = 'form-group';
+    yearGroup.innerHTML = `
+        <label>Год</label>
+        <input type="number" id="yearInput" min="1980" max="2030" value="2025">
+    `;
 
-    months.forEach((month, index) => {
-        const option = document.createElement('option');
-        option.value = index + 1;
-        option.textContent = month;
-        monthSelect.appendChild(option);
-    });
+    // 3. Блок отделов с улучшенной иерархией
+    const departmentGroup = document.createElement('div');
+    departmentGroup.className = 'form-group department-group';
+    departmentGroup.innerHTML = '<label>Отделы</label>';
 
-    monthGroup.appendChild(monthSelect);
-
-
-    const yearGroup = document.createElement('label');
-    yearGroup.textContent = 'Год';
-    const yearInput = document.createElement('input');
-    yearInput.type = 'number';
-    yearInput.id = 'yearInput';
-    yearInput.name = 'year';
-    yearInput.min = 1980;
-    yearInput.max = 2030;
-    yearInput.value = 2025;
-    yearGroup.appendChild(yearInput);
-
-
-    const departmentGroup = document.createElement('label');
-    departmentGroup.textContent = 'Отделы';
     const departmentSelect = document.createElement('select');
     departmentSelect.id = 'departments';
-    departmentSelect.size = 1;
 
+    // Улучшенная функция для добавления отделов
+    const addDepartments = (items, level = 0) => {
+        items.forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept.id;
 
+            // Минималистичные отступы и стрелки
+            const indent = level > 0 ? '│' + ' '.repeat(level * 2 - 1) : '';
+            const arrow = dept.children?.length ? '▼ ' : '  ';
+
+            option.textContent = `${indent}${arrow}${dept.name}`;
+            option.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+
+            // Добавляем CSS-классы для стилизации
+            option.classList.add(`level-${level}`);
+            if (dept.children?.length) {
+                option.classList.add('has-children');
+                option.style.fontWeight = '600';
+            }
+
+            departmentSelect.appendChild(option);
+
+            // Рекурсивно добавляем подотделы
+            if (dept.children?.length) {
+                addDepartments(dept.children, level + 1);
+            }
+        });
+    };
+
+    // Добавляем "Все отделы" как первый элемент
     const defaultOption = document.createElement('option');
     defaultOption.value = '0';
     defaultOption.textContent = 'Все отделы';
+    defaultOption.style.fontWeight = '600';
     departmentSelect.appendChild(defaultOption);
 
     try {
         const departments = await fetchDepartmentTree();
-
-        const addDepartments = (items, level = 0) => {
-            items.forEach(dept => {
-                const option = document.createElement('option');
-                option.value = dept.id;
-                option.textContent = ' '.repeat(level * 2) + dept.name;
-                departmentSelect.appendChild(option);
-
-                if (dept.children && dept.children.length) {
-                    addDepartments(dept.children, level + 1);
-                }
-            });
-        };
-
         addDepartments(departments);
     } catch (error) {
         console.error('Ошибка загрузки департаментов:', error);
-        // Fallback - статичный список (как было раньше)
-        ['1 отдел', '2 отдел', '3 отдел'].forEach((dep, index) => {
-            const option = document.createElement('option');
-            option.value = index + 1;
-            option.textContent = dep;
-            departmentSelect.appendChild(option);
-        });
+        // Иерархический fallback на основе вашего примера
+        const fallbackDepartments = [
+            {
+                id: 1,
+                name: "Кровля",
+                children: [
+                    { id: 2, name: "Доборные элементы" },
+                    {
+                        id: 3,
+                        name: "Металлочерепица",
+                        children: [
+                            { id: 4, name: "Монтеррей" },
+                            { id: 5, name: "Супермонтеррей" }
+                        ]
+                    },
+                    {
+                        id: 6,
+                        name: "Гибкая черепица",
+                        children: [
+                            { id: 7, name: "Shinglas" },
+                            { id: 8, name: "Docke" },
+                            { id: 9, name: "Icopal" }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 10,
+                name: "Софиты",
+                children: [
+                    { id: 11, name: "Виниловые" },
+                    { id: 12, name: "Алюминиевые" }
+                ]
+            }
+        ];
+        addDepartments(fallbackDepartments);
     }
 
     departmentGroup.appendChild(departmentSelect);
 
+    // 4. Блок мониторинга
+    const monitorGroup = document.createElement('div');
+    monitorGroup.className = 'form-group monitor-group';
+    monitorGroup.innerHTML = `
+        <label>Мониторинг</label>
+        <div class="button-group">
+            <button type="button" class="monitor-btn active">По сотрудникам</button>
+            <button type="button" class="monitor-btn">По проектам</button>
+        </div>
+    `;
 
-    const monitorLabel = document.createElement('label');
-    monitorLabel.textContent = 'Мониторинг';
-
-    const monitorByEmployeeBtn = document.createElement('button');
-    monitorByEmployeeBtn.type = 'button';
-    monitorByEmployeeBtn.className = 'monitor-btn';
-    monitorByEmployeeBtn.textContent = 'По сотрудникам';
-
-    const monitorByProjectBtn = document.createElement('button');
-    monitorByProjectBtn.type = 'button';
-    monitorByProjectBtn.className = 'monitor-btn';
-    monitorByProjectBtn.textContent = 'По проектам';
-
+    // 5. Кнопка "Показать"
     const showButton = document.createElement('button');
     showButton.type = 'button';
     showButton.className = 'show-btn';
     showButton.textContent = 'Показать';
 
-    const monitorButtons = [monitorByEmployeeBtn, monitorByProjectBtn];
+    // Собираем форму
+    formRow.appendChild(monthGroup);
+    formRow.appendChild(yearGroup);
+    formRow.appendChild(departmentGroup);
+    formRow.appendChild(monitorGroup);
+    formRow.appendChild(showButton);
 
+    // Обработчики событий для кнопок мониторинга
+    const monitorButtons = monitorGroup.querySelectorAll('.monitor-btn');
     monitorButtons.forEach(button => {
         button.addEventListener('click', () => {
             monitorButtons.forEach(btn => btn.classList.remove('active'));
@@ -119,15 +158,15 @@ export async function renderHeader(containerId = 'header-container') {
         });
     });
 
-    // Собираем форму (оставляем без изменений)
-    formRow.appendChild(monthGroup);
-    formRow.appendChild(yearGroup);
-    formRow.appendChild(departmentGroup);
-    formRow.appendChild(monitorLabel);
-    formRow.appendChild(monitorByEmployeeBtn);
-    formRow.appendChild(monitorByProjectBtn);
-    formRow.appendChild(showButton);
-
     header.appendChild(formRow);
     container.appendChild(header);
+
+    // Возвращаем элементы для внешнего доступа
+    return {
+        monthSelect,
+        yearInput,
+        departmentSelect,
+        monitorButtons,
+        showButton
+    };
 }
