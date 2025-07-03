@@ -28,5 +28,4 @@ function renderDateSelector() {
     document.getElementById('date-selector').innerHTML = html;
 }
 
-// Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', renderDateSelector);
