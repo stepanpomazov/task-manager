@@ -1,4 +1,4 @@
-import { fetchDepartmentTree } from './data_header.js';
+import { fetchDepartmentTree } from "./data_header.js";
 
 export async function renderHeader(containerId = 'header-container') {
     const container = document.getElementById(containerId);
@@ -15,158 +15,213 @@ export async function renderHeader(containerId = 'header-container') {
     const formRow = document.createElement('div');
     formRow.className = 'form-row';
 
-    // 1. Блок месяца
-    const monthGroup = document.createElement('div');
-    monthGroup.className = 'form-group';
-    monthGroup.innerHTML = `
-        <label>Месяц</label>
-        <select id="monthSelect">
-            ${["Январь","Февраль","Март","Апрель","Май","Июнь",
-        "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-        .map((month, index) => `<option value="${index + 1}">${month}</option>`)
-        .join('')}
-        </select>
-    `;
+    // Блок месяца
+    const monthGroup = document.createElement('label');
+    monthGroup.textContent = 'Месяц';
+    const monthSelect = document.createElement('select');
+    monthSelect.id = 'monthSelect';
+    monthSelect.name = 'month';
 
-    // 2. Блок года
-    const yearGroup = document.createElement('div');
-    yearGroup.className = 'form-group';
-    yearGroup.innerHTML = `
-        <label>Год</label>
-        <input type="number" id="yearInput" min="1980" max="2030" value="2025">
-    `;
+    const months = [
+        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+    ];
 
-    // 3. Блок отделов с улучшенной иерархией
-    const departmentGroup = document.createElement('div');
-    departmentGroup.className = 'form-group department-group';
-    departmentGroup.innerHTML = '<label>Отделы</label>';
+    months.forEach((month, index) => {
+        const option = document.createElement('option');
+        option.value = index + 1;
+        option.textContent = month;
+        monthSelect.appendChild(option);
+    });
 
-    const departmentSelect = document.createElement('select');
-    departmentSelect.id = 'departments';
+    monthGroup.appendChild(monthSelect);
 
-    // Улучшенная функция для добавления отделов
-    const addDepartments = (items, level = 0) => {
-        items.forEach(dept => {
-            const option = document.createElement('option');
-            option.value = dept.id;
+    // Блок года
+    const yearGroup = document.createElement('label');
+    yearGroup.textContent = 'Год';
+    const yearInput = document.createElement('input');
+    yearInput.type = 'number';
+    yearInput.id = 'yearInput';
+    yearInput.name = 'year';
+    yearInput.min = 1980;
+    yearInput.max = 2030;
+    yearInput.value = new Date().getFullYear();
+    yearGroup.appendChild(yearInput);
 
-            // Минималистичные отступы и стрелки
-            const indent = level > 0 ? '│' + ' '.repeat(level * 2 - 1) : '';
-            const arrow = dept.children?.length ? '▼ ' : '  ';
+    const departmentGroup = document.createElement('label');
+    departmentGroup.className = 'department-group';
+    departmentGroup.style.display = 'flex';
+    departmentGroup.style.alignItems = 'center';
+    departmentGroup.style.gap = '10px';
 
-            option.textContent = `${indent}${arrow}${dept.name}`;
-            option.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+// Текст "Отделы"
+    const departmentLabel = document.createElement('span');
+    departmentLabel.textContent = 'Отделы';
+    departmentLabel.style.whiteSpace = 'nowrap';
+    departmentGroup.appendChild(departmentLabel);
 
-            // Добавляем CSS-классы для стилизации
-            option.classList.add(`level-${level}`);
-            if (dept.children?.length) {
-                option.classList.add('has-children');
-                option.style.fontWeight = '600';
-            }
+// Контейнер для выпадающего списка
+    const deptSelectContainer = document.createElement('div');
+    deptSelectContainer.className = 'dept-select-container';
+    deptSelectContainer.style.position = 'relative';
+    deptSelectContainer.style.display = 'inline-flex';
 
-            departmentSelect.appendChild(option);
+// Триггер для открытия списка
+    const deptTrigger = document.createElement('div');
+    deptTrigger.className = 'dept-trigger';
+    deptTrigger.textContent = 'Выберите отдел';
+    deptTrigger.style.display = 'inline-flex';
+    deptTrigger.style.alignItems = 'center';
+    deptTrigger.style.minWidth = '180px';
 
-            // Рекурсивно добавляем подотделы
-            if (dept.children?.length) {
-                addDepartments(dept.children, level + 1);
-            }
-        });
-    };
+// Выпадающий список
+    const deptPopup = document.createElement('div');
+    deptPopup.className = 'dept-popup';
+    deptPopup.style.display = 'none';
 
-    // Добавляем "Все отделы" как первый элемент
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '0';
-    defaultOption.textContent = 'Все отделы';
-    defaultOption.style.fontWeight = '600';
-    departmentSelect.appendChild(defaultOption);
+    deptSelectContainer.appendChild(deptTrigger);
+    deptSelectContainer.appendChild(deptPopup);
+    departmentGroup.appendChild(deptSelectContainer);
 
+    // Обработчики событий
+    deptTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deptPopup.style.display = deptPopup.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!deptSelectContainer.contains(e.target)) {
+            deptPopup.style.display = 'none';
+        }
+    });
+
+    // Загрузка и отрисовка дерева отделов
     try {
         const departments = await fetchDepartmentTree();
-        addDepartments(departments);
+        let maxWidth = 180; // Минимальная ширина
+
+        const renderDepartment = (items, level = 0) => {
+            const container = document.createElement('div');
+            container.className = 'dept-level';
+
+            items.forEach(item => {
+                const deptItem = document.createElement('div');
+                deptItem.className = 'dept-item';
+                deptItem.style.paddingLeft = `${level * 15}px`;
+
+                const deptContent = document.createElement('div');
+                deptContent.className = 'dept-content';
+
+                if (item.children && item.children.length > 0) {
+                    const toggle = document.createElement('span');
+                    toggle.className = 'dept-toggle';
+                    toggle.textContent = '▶';
+                    deptContent.appendChild(toggle);
+                } else {
+                    const spacer = document.createElement('span');
+                    spacer.className = 'dept-spacer';
+                    spacer.textContent = ' ';
+                    deptContent.appendChild(spacer);
+                }
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'dept-name';
+                nameSpan.textContent = item.name;
+                deptContent.appendChild(nameSpan);
+
+                deptItem.appendChild(deptContent);
+                container.appendChild(deptItem);
+
+                // Обработчик выбора (работает для всех элементов)
+                deptContent.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deptTrigger.textContent = item.name;
+                    deptTrigger.dataset.id = item.id;
+                    deptPopup.style.display = 'none';
+                });
+
+                // Обработчик раскрытия
+                if (item.children && item.children.length > 0) {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'dept-children';
+                    childrenContainer.style.display = 'none';
+
+                    childrenContainer.appendChild(renderDepartment(item.children, level + 1));
+                    deptItem.appendChild(childrenContainer);
+
+                    const toggle = deptItem.querySelector('.dept-toggle');
+                    toggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isHidden = childrenContainer.style.display === 'none';
+                        childrenContainer.style.display = isHidden ? 'block' : 'none';
+                        toggle.textContent = isHidden ? '▼' : '▶';
+
+                        // Обновляем ширину popup
+                        deptPopup.style.width = 'auto';
+                        const newWidth = deptPopup.scrollWidth + 20;
+                        if (newWidth > maxWidth) {
+                            maxWidth = newWidth;
+                            deptPopup.style.width = `${maxWidth}px`;
+                        }
+                    });
+                }
+
+                // Рассчитываем максимальную ширину
+                const itemWidth = deptContent.scrollWidth + (level * 15) + 30;
+                if (itemWidth > maxWidth) {
+                    maxWidth = itemWidth;
+                    deptPopup.style.width = `${maxWidth}px`;
+                }
+            });
+
+            return container;
+        };
+
+        deptPopup.appendChild(renderDepartment(departments));
+        deptPopup.style.width = `${maxWidth}px`;
     } catch (error) {
         console.error('Ошибка загрузки департаментов:', error);
-        // Иерархический fallback на основе вашего примера
-        const fallbackDepartments = [
-            {
-                id: 1,
-                name: "Кровля",
-                children: [
-                    { id: 2, name: "Доборные элементы" },
-                    {
-                        id: 3,
-                        name: "Металлочерепица",
-                        children: [
-                            { id: 4, name: "Монтеррей" },
-                            { id: 5, name: "Супермонтеррей" }
-                        ]
-                    },
-                    {
-                        id: 6,
-                        name: "Гибкая черепица",
-                        children: [
-                            { id: 7, name: "Shinglas" },
-                            { id: 8, name: "Docke" },
-                            { id: 9, name: "Icopal" }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 10,
-                name: "Софиты",
-                children: [
-                    { id: 11, name: "Виниловые" },
-                    { id: 12, name: "Алюминиевые" }
-                ]
-            }
-        ];
-        addDepartments(fallbackDepartments);
+        deptTrigger.textContent = 'Ошибка загрузки';
     }
 
-    departmentGroup.appendChild(departmentSelect);
+    // Блок мониторинга
+    const monitorLabel = document.createElement('label');
+    monitorLabel.textContent = 'Мониторинг';
 
-    // 4. Блок мониторинга
-    const monitorGroup = document.createElement('div');
-    monitorGroup.className = 'form-group monitor-group';
-    monitorGroup.innerHTML = `
-        <label>Мониторинг</label>
-        <div class="button-group">
-            <button type="button" class="monitor-btn active">По сотрудникам</button>
-            <button type="button" class="monitor-btn">По проектам</button>
-        </div>
-    `;
+    const monitorByEmployeeBtn = document.createElement('button');
+    monitorByEmployeeBtn.type = 'button';
+    monitorByEmployeeBtn.className = 'monitor-btn';
+    monitorByEmployeeBtn.textContent = 'По сотрудникам';
 
-    // 5. Кнопка "Показать"
+    const monitorByProjectBtn = document.createElement('button');
+    monitorByProjectBtn.type = 'button';
+    monitorByProjectBtn.className = 'monitor-btn';
+    monitorByProjectBtn.textContent = 'По проектам';
+
     const showButton = document.createElement('button');
     showButton.type = 'button';
     showButton.className = 'show-btn';
     showButton.textContent = 'Показать';
 
-    // Собираем форму
-    formRow.appendChild(monthGroup);
-    formRow.appendChild(yearGroup);
-    formRow.appendChild(departmentGroup);
-    formRow.appendChild(monitorGroup);
-    formRow.appendChild(showButton);
-
-    // Обработчики событий для кнопок мониторинга
-    const monitorButtons = monitorGroup.querySelectorAll('.monitor-btn');
-    monitorButtons.forEach(button => {
+    // Активация кнопок мониторинга
+    [monitorByEmployeeBtn, monitorByProjectBtn].forEach(button => {
         button.addEventListener('click', () => {
-            monitorButtons.forEach(btn => btn.classList.remove('active'));
+            [monitorByEmployeeBtn, monitorByProjectBtn].forEach(btn => {
+                btn.classList.remove('active');
+            });
             button.classList.add('active');
         });
     });
 
+    // Сборка формы
+    formRow.appendChild(monthGroup);
+    formRow.appendChild(yearGroup);
+    formRow.appendChild(departmentGroup);
+    formRow.appendChild(monitorLabel);
+    formRow.appendChild(monitorByEmployeeBtn);
+    formRow.appendChild(monitorByProjectBtn);
+    formRow.appendChild(showButton);
+
     header.appendChild(formRow);
     container.appendChild(header);
-
-    // Возвращаем элементы для внешнего доступа
-    return {
-        monthSelect,
-        yearInput,
-        departmentSelect,
-        monitorButtons,
-        showButton
-    };
 }
