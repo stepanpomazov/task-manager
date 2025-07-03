@@ -1,4 +1,4 @@
-import { renderHeader } from './components/Header/header.js';  // Добавьте .js
+import { renderHeader } from './components/Header/header.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     renderHeader();
