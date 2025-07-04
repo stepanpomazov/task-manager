@@ -146,7 +146,8 @@ th:not(:first-child) {
 }
 
 .hidden {
-    display: none;
+    display: flex;
+
 }
 
 tr:last-child td {
