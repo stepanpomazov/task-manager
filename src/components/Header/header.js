@@ -363,3 +363,29 @@ export async function renderHeader(containerId = "header-container") {
 
   container.appendChild(header);
 }
+
+
+// скрываем хедер
+document.addEventListener('DOMContentLoaded', function () {
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  const header = document.getElementById('main-header');
+
+  // Функция для проверки размера экрана
+  function handleScreenSize() {
+    if (window.innerWidth < 1172) {
+      // Если экран меньше 1172px:
+      header.style.display = 'none'; // Скрываем header
+      menuBtn.style.display = 'inline-block'; // Показываем кнопку
+    } else {
+      // Если экран ≥ 1172px:
+      header.style.display = 'block'; // Показываем header
+      menuBtn.style.display = 'none'; // Скрываем кнопку
+    }
+  }
+
+  // Вызываем функцию при загрузке страницы
+  handleScreenSize();
+
+  // Обрабатываем изменение размера окна
+  window.addEventListener('resize', handleScreenSize);
+});

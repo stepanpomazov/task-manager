@@ -10,8 +10,62 @@
     <link rel="stylesheet" href="src/styles/header-styles.css" />
   </head>
   <body>
+    <!-- Кнопка для мобильного меню -->
+<button id="mobileMenuBtn" class="menu-btn">☰ Меню</button>
+
     <div id="header-container"></div>
+    <div id="mobile-popup"></div>
     <div id="table-wrapper"></div>
-    <script type="module" src="./src/main.js"></script>
+  <button class="close-btn">×</button>
+  <div id="popup-content"></div>
+  <script type="module" src="./src/main.js"></script>
+
+
+
+
+  <script>
+  // Ждём полной загрузки DOM
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.getElementById("mobileMenuBtn");
+    const mobilePopup = document.getElementById("mobile-popup");
+    const popupContent = document.getElementById("popup-content");
+    const headerContainer = document.getElementById("header-container");
+
+    if (!menuBtn || !mobilePopup || !popupContent || !headerContainer) {
+      console.error("Не все элементы найдены.");
+      return;
+    }
+
+    // Добавляем клон хедера один раз
+    if (!mobilePopup.dataset.initialized) {
+      const headerClone = headerContainer.cloneNode(true);
+      popupContent.appendChild(headerClone);
+      mobilePopup.dataset.initialized = "true";
+    }
+
+    // Открытие попапа
+    menuBtn.addEventListener("click", () => {
+      mobilePopup.style.display = "block";
+      document.body.style.overflow = "hidden";
+    });
+
+    // Закрытие по крестику
+    const closeBtn = mobilePopup.querySelector(".close-btn");
+    closeBtn.addEventListener("click", () => {
+      mobilePopup.style.display = "none";
+      document.body.style.overflow = "";
+    });
+
+    // Закрытие по клику вне контента
+    mobilePopup.addEventListener("click", (e) => {
+      if (e.target === mobilePopup) {
+        mobilePopup.style.display = "none";
+        document.body.style.overflow = "";
+      }
+    });
+  });
+</script>
+
   </body>
 </html>
+
