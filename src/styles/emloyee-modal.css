@@ -1,0 +1,100 @@
+
+        .open-modal-btn {
+            padding: 10px 20px;
+            background-color: #1e41ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px;
+        }
+        
+        /* Стили модального окна */
+        .employee-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            font-family: Arial, sans-serif;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+        
+        /* Стили содержимого */
+        .employee-name {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .workload-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        
+        .workload-info {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .tasks-section {
+            margin-top: 25px;
+        }
+        
+        .task-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .task-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .task-name {
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .task-link {
+            color: #1e41ff;
+            text-decoration: none;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        
+        .task-link:hover {
+            text-decoration: underline;
+        }
+    
