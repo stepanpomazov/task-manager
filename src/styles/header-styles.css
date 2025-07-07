@@ -10,7 +10,40 @@
   justify-content: space-between;
 }
 
-.form-row {
+.menu-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+}
+
+.header-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-left label,
+.header-right label {
+  display: flex;
+  flex-wrap: wrap; /* если нужно переносить строки на малых экранах */
+  align-items: center;
+  gap: 8px;
+}
+
+/* .form-row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -26,7 +59,7 @@
 
 .form-row > * {
   flex: 0 1 auto;
-}
+} */
 
 #monthSelect,
 #yearInput {
@@ -44,7 +77,6 @@
   position: relative;
   display: inline-block;
 }
-
 
 .month-trigger {
   display: flex;
@@ -231,11 +263,11 @@
   display: flex;
   justify-content: center;
   transition: transform 0.2s;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .dept-toggle svg {
-  transform-origin: center; 
+  transform-origin: center;
 }
 
 .dept-spacer {
@@ -255,9 +287,10 @@
 }
 
 .monitor-buttons {
-  display: inline-flex; 
+  display: inline-flex;
   gap: 8px;
-  align-items: center; 
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .monitor-btn {
@@ -290,155 +323,102 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-left: auto;
 }
 
 .show-btn:hover {
   background-color: #000000;
   transform: translateY(-1px);
 }
-/* Бургер-меню */
-.burger-button {
+
+/* Бургер скрыт по умолчанию */
+.burger-toggle {
   display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  width: 24px;
+  height: 24px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 10px;
-  margin-bottom: 20px;
-  z-index: 100;
+  z-index: 9999;
 }
 
-.burger-button svg {
-  width: 24px;
-  height: 24px;
-  color: #000;
+.burger-toggle span {
+  display: block;
+  height: 3px;
+  background-color: #333;
+  border-radius: 2px;
+  margin: 4px 0; /* Отступ между полосками */
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Мобильное меню */
-.mobile-menu-overlay {
+.burger-toggle.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.burger-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.burger-toggle.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.menu-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 998;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4); /* затемнение */
+  z-index: 998; /* ниже, чем бургер-меню */
   display: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
-.mobile-menu-overlay.active {
-  display: block;
-  opacity: 1;
-}
-
-.mobile-menu {
-  position: fixed;
-  top: 0;
-  left: -300px;
-  width: 300px;
-  height: 100%;
-  background-color: white;
-  z-index: 999;
-  transition: transform 0.3s ease;
-  overflow-y: auto;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.mobile-menu.active {
-  transform: translateX(300px);
-}
-
-.close-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 1000;
-}
-
-.close-button svg {
-  width: 24px;
-  height: 24px;
-  color: #000;
-}
-
-/* Адаптация для мобильного меню */
-.mobile-header {
-  padding: 20px;
-}
-
-.mobile-header .header {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.mobile-header .form-row {
-  flex-direction: column;
-  gap: 20px;
-}
-
-.mobile-header .header-left,
-.mobile-header .header-right {
-  width: 100%;
-}
-
-.mobile-header .monitor-buttons {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.mobile-header .show-btn {
-  margin-top: 20px;
-  margin-left: 0;
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 1170px) {
-  .header {
-    display: none;
-  }
-
-  .burger-button {
+@media (max-width: 1160px) {
+  /* Бургер-кнопка */
+  .burger-toggle {
     display: block;
-  }
-}
-
-@media (max-width: 768px) {
-  .mobile-menu {
-    width: 80%;
-    left: -80%;
+    z-index: 1001;
+    position: relative; /* Чтобы была поверх других элементов */
   }
 
-  .mobile-menu.active {
-    transform: translateX(80%);
-  }
-}
-@media (max-width: 768px) {
+  /* Основной контейнер шапки */
   .header {
-    padding: 12px;
-    border-radius: 20px;
+    position: relative;
+    background-color: #e9e9e9;
   }
 
-  .form-row {
-    gap: 10px;
+  .header-right {
+    display: flex;
   }
 
-  #monthSelect,
-  #yearInput,
-  .dept-trigger,
-  .monitor-btn,
-  .show-btn {
-    padding: 6px 12px;
-    font-size: 13px;
+  /* Контейнер меню */
+  .menu-container {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 70%;
+    height: 100vh;
+    background: white;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column; /* Главное изменение - колонка */
+    justify-content: flex-start;
+    gap: 20px;
+    padding-top: 80px;
+    padding-left: 40px;
   }
 
-  .dept-popup {
-    width: 100%;
-    max-width: 100vw;
-    box-sizing: border-box;
+  /* Показываем меню */
+  .menu-open .menu-container {
+    left: 0;
+    display: flex;
   }
 }
