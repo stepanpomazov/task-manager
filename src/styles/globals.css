@@ -102,90 +102,23 @@ select, input[type="checkbox"] {
 
 
 
-.menu-btn {
-  display: none;
-  padding: 10px 15px;
-  background-color:  #1e41ff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
+
+
+
+/* Добавьте эти стили */
+#table-wrapper {
+    position: relative;
+    z-index: 2; /* Выше чем overlay (999) и меню (1000) */
+    transition: none; /* Отключаем переходы если они есть */
 }
 
-@media (max-width: 1171px) {
-  .menu-btn {
-    display: inline-block;
-  }
-
-  #header-container {
-    display: none; /* Прячем ваш div */
-  }
+#mobile-popup {
+    z-index: 1000; /* Меню должно быть выше overlay */
 }
 
-  /* Стили для кнопки меню */
-    .menu-btn {
-      display: none;
-      padding: 10px 15px;
-      background-color: #1e41ff;
-      color: white;
-      border: none;
-      border-radius: 15px;
-      cursor: pointer;
-      font-size: 14px;
-      z-index: 1001;
-      position: relative;
-    }
-.menu-btn:hover{
-    background-color: #9f9f9f;
-    color: #000;
+.overlay {
+    z-index: 999; /* Затемнение под меню, но над контентом */
 }
-    /* Стили для мобильного попапа */
-    #mobile-popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: white;
-      z-index: 1000;
-      padding: 60px 20px 20px;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 24px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 1002;
-    }
-
-    @media (max-width: 1171px) {
-      .menu-btn {
-        display: inline-block;
-      }
-      #header-container {
-        display: none;
-      }
-    }
 
 
-     /* Адаптивные стили для содержимого попапа */
-      #mobile-popup .header {
-        flex-direction: column;
-      }
-      #mobile-popup .form-row {
-        flex-direction: column;
-        gap: 15px;
-      }
-      #mobile-popup .header-left,
-      #mobile-popup .header-right {
-        width: 100%;
-      }
-    
+

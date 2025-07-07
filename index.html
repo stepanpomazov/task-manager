@@ -5,66 +5,160 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Мониторинг сотрудников</title>
     <link rel="stylesheet" href="src/styles/globals.css" />
-    <link rel="stylesheet" href="src/styles/date-selector-styles.css" />
     <link rel="stylesheet" href="src/styles/table-styles.css" />
     <link rel="stylesheet" href="src/styles/header-styles.css" />
+    <link rel="stylesheet" href="src/styles/popap.css" />
   </head>
-  <body>
-    <!-- Кнопка для мобильного меню -->
+<body>
+
+<!-- Кнопка мобильного меню -->
 <button id="mobileMenuBtn" class="menu-btn">☰ Меню</button>
 
-    <div id="header-container"></div>
-    <div id="mobile-popup"></div>
-    <div id="table-wrapper"></div>
-  <button class="close-btn">×</button>
+<!-- Хедер -->
+<div id="header-container">
+</div>
+
+<!-- Таблица -->
+<div id="table-wrapper">
+</div>
+
+<!-- Попап -->
+<div id="mobile-popup">
+  <span class="close-btn">×</span>
   <div id="popup-content"></div>
-  <script type="module" src="./src/main.js"></script>
+</div>
+<!-- Затемнение фона (добавлен отсутствующий элемент) -->
+<div class="overlay"></div>
 
 
-
-
-  <script>
-  // Ждём полной загрузки DOM
-  document.addEventListener('DOMContentLoaded', () => {
-    const menuBtn = document.getElementById("mobileMenuBtn");
-    const mobilePopup = document.getElementById("mobile-popup");
-    const popupContent = document.getElementById("popup-content");
-    const headerContainer = document.getElementById("header-container");
-
-    if (!menuBtn || !mobilePopup || !popupContent || !headerContainer) {
-      console.error("Не все элементы найдены.");
-      return;
-    }
-
-    // Добавляем клон хедера один раз
-    if (!mobilePopup.dataset.initialized) {
-      const headerClone = headerContainer.cloneNode(true);
-      popupContent.appendChild(headerClone);
-      mobilePopup.dataset.initialized = "true";
-    }
-
-    // Открытие попапа
-    menuBtn.addEventListener("click", () => {
-      mobilePopup.style.display = "block";
-      document.body.style.overflow = "hidden";
-    });
-
-    // Закрытие по крестику
-    const closeBtn = mobilePopup.querySelector(".close-btn");
-    closeBtn.addEventListener("click", () => {
-      mobilePopup.style.display = "none";
-      document.body.style.overflow = "";
-    });
-
-    // Закрытие по клику вне контента
-    mobilePopup.addEventListener("click", (e) => {
-      if (e.target === mobilePopup) {
-        mobilePopup.style.display = "none";
-        document.body.style.overflow = "";
-      }
-    });
-  });
+<script type="module" src="./src/main.js">
+  // Импортируем необходимые функции
+    import { renderHeader, fetchDepartmentTree } from './src/header.js';
+    
+    // Делаем функции доступными глобально для обработчиков событий
+    window.renderHeader = renderHeader;
+    window.fetchDepartmentTree = fetchDepartmentTree;
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const menuBtn = document.getElementById("mobileMenuBtn");
+  const mobilePopup = document.getElementById("mobile-popup");
+  const popupContent = document.getElementById("popup-content");
+  const overlay = document.querySelector(".overlay");
+
+  // Проверка наличия всех элементов
+  if (!menuBtn || !mobilePopup || !popupContent || !overlay) {
+    console.error("Не все элементы найдены.");
+    return;
+  }
+
+  let headerInitialized = false;
+
+  // Функция для клонирования хедера с сохранением функционала
+  async function cloneHeaderToPopup() {
+    if (headerInitialized) return;
+
+    try {
+      // Ждём завершения рендера хедера
+      await new Promise(resolve => {
+        const checkHeader = setInterval(() => {
+          const headerContainer = document.getElementById("header-container");
+          if (headerContainer && headerContainer.children.length > 0) {
+            clearInterval(checkHeader);
+            resolve();
+          }
+        }, 50); // Проверяем каждые 50мс
+      });
+
+      const headerContainer = document.getElementById("header-container");
+      const headerClone = headerContainer.cloneNode(true);
+
+      // Удаляем ID, чтобы не было дубликатов
+      headerClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+
+      // Очищаем и добавляем клон
+      popupContent.innerHTML = '';
+      popupContent.appendChild(headerClone);
+
+      // Добавляем обработчики событий для кнопок "По сотрудникам" / "По проектам"
+      initClonedHeaderEvents();
+
+      headerInitialized = true;
+
+    } catch (err) {
+      console.error("Ошибка при клонировании хедера:", err);
+    }
+  }
+
+  function initClonedHeaderEvents() {
+    const monitorButtons = popupContent.querySelectorAll('.monitor-btn');
+    if (monitorButtons.length >= 2) {
+      const [monitorByEmployeeBtn, monitorByProjectBtn] = monitorButtons;
+
+      monitorByEmployeeBtn.addEventListener("click", () => {
+        monitorByEmployeeBtn.classList.add("active");
+        monitorByProjectBtn.classList.remove("active");
+      });
+
+      monitorByProjectBtn.addEventListener("click", () => {
+        monitorByProjectBtn.classList.add("active");
+        monitorByEmployeeBtn.classList.remove("active");
+      });
+    }
+  }
+
+  // Открытие/закрытие попапа
+  function openMobileMenu() {
+    cloneHeaderToPopup();
+    mobilePopup.classList.add("open");
+    overlay.style.display = "block";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMobileMenu() {
+    mobilePopup.classList.remove("open");
+    overlay.style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  // Обработчики событий
+  menuBtn.addEventListener("click", openMobileMenu);
+  overlay.addEventListener("click", closeMobileMenu);
+  document.querySelector(".close-btn").addEventListener("click", closeMobileMenu);
+
+  // Адаптация под размер экрана
+  function handleResize() {
+    const headerContainer = document.getElementById("header-container");
+    if (window.innerWidth <= 1171) {
+      menuBtn.style.display = "inline-block";
+      if (headerContainer) headerContainer.style.display = "none";
+    } else {
+      menuBtn.style.display = "none";
+      if (headerContainer) headerContainer.style.display = "block";
+      closeMobileMenu();
+    }
+  }
+
+  // Инициализация
+  handleResize();
+  window.addEventListener("resize", handleResize);
+});
+</script>
+
+
+
 
   </body>
 </html>

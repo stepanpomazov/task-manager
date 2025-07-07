@@ -365,16 +365,18 @@ export async function renderHeader(containerId = "header-container") {
 }
 
 
+
+
 // скрываем хедер
 document.addEventListener('DOMContentLoaded', function () {
   const menuBtn = document.getElementById('mobileMenuBtn');
-  const header = document.getElementById('main-header');
+  const header = document.getElementById('header-container');
 
   // Функция для проверки размера экрана
   function handleScreenSize() {
     if (window.innerWidth < 1172) {
       // Если экран меньше 1172px:
-      header.style.display = 'none'; // Скрываем header
+      header.style.display = 'none !important'; // Скрываем header
       menuBtn.style.display = 'inline-block'; // Показываем кнопку
     } else {
       // Если экран ≥ 1172px:
@@ -388,4 +390,98 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Обрабатываем изменение размера окна
   window.addEventListener('resize', handleScreenSize);
+});
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const menuBtn = document.getElementById("mobileMenuBtn");
+  const mobilePopup = document.getElementById("mobile-popup");
+  const popupContent = document.getElementById("popup-content");
+  const overlay = document.querySelector(".overlay");
+
+  // Проверка наличия всех элементов
+  if (!menuBtn || !mobilePopup || !popupContent || !overlay) {
+    console.error("Не все элементы найдены");
+    return;
+  }
+
+  let popupInitialized = false;
+
+  // Функция для рендера хедера в попапе
+  async function renderHeaderInPopup() {
+    if (!popupInitialized) {
+      // Очищаем содержимое попапа
+      popupContent.innerHTML = "";
+
+      // Рендерим хедер прямо в попап
+      await renderHeader("popup-content");
+
+      // Можно дополнительно добавить обработчики событий для кнопок внутри попапа
+      initPopupEvents();
+
+      popupInitialized = true;
+    }
+  }
+
+  // Инициализация событий внутри попапа (если нужно)
+  function initPopupEvents() {
+    // Пример: активные кнопки "По сотрудникам" / "По проектам"
+    const monitorButtons = popupContent.querySelectorAll('.monitor-btn');
+    if (monitorButtons.length >= 2) {
+      const [byEmployeeBtn, byProjectBtn] = monitorButtons;
+
+      byEmployeeBtn.addEventListener('click', () => {
+        byEmployeeBtn.classList.add('active');
+        byProjectBtn.classList.remove('active');
+      });
+
+      byProjectBtn.addEventListener('click', () => {
+        byProjectBtn.classList.add('active');
+        byEmployeeBtn.classList.remove('active');
+      });
+    }
+  }
+
+  // Функции открытия/закрытия меню
+  function openMobileMenu() {
+    renderHeaderInPopup(); // рендерим хедер при открытии попапа
+    mobilePopup.classList.add("open");
+    overlay.style.display = "block";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMobileMenu() {
+    mobilePopup.classList.remove("open");
+    overlay.style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  // Обработчики событий
+  menuBtn.addEventListener("click", openMobileMenu);
+  overlay.addEventListener("click", closeMobileMenu);
+  document.querySelector(".close-btn")?.addEventListener("click", closeMobileMenu);
+
+  // Адаптация под размер экрана
+  function handleResize() {
+    if (window.innerWidth <= 1171) {
+      menuBtn.style.display = "inline-block";
+      document.getElementById("header-container").style.display = "none";
+    } else {
+      menuBtn.style.display = "none";
+      document.getElementById("header-container").style.display = "block";
+      closeMobileMenu();
+    }
+  }
+
+  // Инициализация
+  handleResize();
+  window.addEventListener("resize", handleResize);
 });
