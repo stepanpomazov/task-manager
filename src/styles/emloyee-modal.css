@@ -1,0 +1,201 @@
+        #openModalBtn {
+            padding: 12px 24px;
+            background-color: #1e41ff;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        #openModalBtn:hover {
+            background-color: #0d30e0;
+        }
+        
+        /* Стили модального окна */
+        .employee-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px); /* ← Вот он, эффект блюра */
+            -webkit-backdrop-filter: blur(5px); /* Для Safari */
+            animation: fadeIn 0.3s;
+        }
+      
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 25px;
+            width: 85%;
+            max-width: 650px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            font-family: Arial, sans-serif;
+            position: relative;
+            animation: slideDown 0.4s;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000000;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        /* Стили содержимого */
+        .employee-name {
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: #222;
+        }
+        
+        .workload-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .workload-info {
+            margin-bottom: 10px;
+            color: #444;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .workload-value{
+             display: inline; /* Делаем статус строчным элементом */
+        font-weight: bold;
+        color: #1E41FF;
+        font-size: 12px;
+        margin-left: 10px; /* Отступ между "Задачи" и "ACTIVE" */
+        vertical-align: middle;
+        border-radius: 15px;
+        background-color: #EAF2FF;
+        border-radius: 8px;
+        padding: 4px 8px;
+        }
+        .workload-label{
+            color: #8F9098;
+        }
+        .tasks-section h3 {
+        display: inline; /* Делаем заголовок строчным элементом */
+        font-size: 18px;
+        color: #444;
+        margin: 0;
+        padding: 0;
+        vertical-align: middle; /* Выравниваем по вертикали */
+        }
+
+        .task-status {
+        display: inline; /* Делаем статус строчным элементом */
+        font-weight: bold;
+        color: #1f7d02;
+        font-size: 12px;
+        margin-left: 10px; /* Отступ между "Задачи" и "ACTIVE" */
+        vertical-align: middle;
+        border-radius: 15px;
+        background-color: #E0FFD7;
+        border-radius: 8px;
+        padding: 4px 8px;
+        }       
+        
+        .task-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 20px;
+        }
+        
+        .task-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+       
+
+        .task-title-container {
+        margin-bottom: 15px;
+        }
+
+        
+        .task-link {
+            color: #1e41ff;
+            text-decoration: none;
+            font-size: 14px;
+            word-break: break-all;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .task-link:hover {
+            text-decoration: underline;
+        }
+                
+        .task-header {
+            display: flex;       /* Используем flex для размещения в строке */
+            align-items: center; /* Выравниваем по вертикали */
+            gap: 8px;           /* Расстояние между элементами */
+            margin-bottom: 5px; /* Отступ перед ссылкой */
+        }
+
+        .task-name {
+            color: #8F9098;
+            font-size: 16px;
+        }
+
+        .task-time {
+            color: #000000;
+            font-size: 14px;
+            display: inline; /* Делаем статус строчным элементом */
+            font-weight: bold;
+
+        }
+
+        .task-link {
+            color: #1e41ff;
+            text-decoration: none;
+            font-size: 14px;
+            word-break: break-all;
+            display: block;
+            margin-top: 3px;
+        }
+
+        .task-link:hover {
+            text-decoration: underline;
+        }
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        
