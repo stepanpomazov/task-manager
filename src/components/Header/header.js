@@ -12,10 +12,23 @@ export async function renderHeader(containerId = "header-container") {
   const header = document.createElement("div");
   header.className = "header";
 
+  // Контейнер для кнопки и надписи
+  const menuToggle = document.createElement("div");
+  menuToggle.className = "menu-toggle"; // <-- новый класс
+
   // Создаем кнопку бургер-меню
   const burgerButton = document.createElement("button");
   burgerButton.className = "burger-toggle";
   burgerButton.setAttribute("aria-label", "Открыть меню");
+
+  // Создаем надпись рядом с бургером
+  const menuText = document.createElement("span");
+  menuText.className = "menu-text";
+  menuText.textContent = "Мониторинг"; // или "Навигация"
+
+  menuToggle.appendChild(burgerButton);
+  menuToggle.appendChild(menuText);
+  header.appendChild(menuToggle); // бургер + "Меню"
 
   // Создаем затемняющий фон
   const overlay = document.createElement("div");
@@ -27,18 +40,20 @@ export async function renderHeader(containerId = "header-container") {
     const span = document.createElement("span");
     burgerButton.appendChild(span);
   }
-  header.appendChild(burgerButton);
 
   // Обработчик клика на бургер
   burgerButton.addEventListener("click", () => {
     const isOpen = header.classList.toggle("menu-open");
     burgerButton.classList.toggle("open");
+    menuText.textContent = isOpen ? "Меню" : "Мониторинг";
     overlay.style.display = isOpen ? "block" : "none";
   });
 
   overlay.addEventListener("click", () => {
     header.classList.remove("menu-open");
     overlay.style.display = "none";
+    menuText.textContent = "Мониторинг";
+    burgerButton.classList.toggle("open");
   });
 
   // 2. Блок выбора месяца
@@ -297,7 +312,7 @@ async function createDepartmentSelect() {
       items.forEach((item) => {
         const deptItem = document.createElement("div");
         deptItem.className = "dept-item";
-        deptItem.style.paddingLeft = `${level * 15}px`;
+        deptItem.style.paddingLeft = `${level * 0}px`;
 
         const deptContent = document.createElement("div");
         deptContent.className = "dept-content";
@@ -312,16 +327,8 @@ async function createDepartmentSelect() {
                     `;
           toggle.style.transform = "rotate(-90deg)";
           deptContent.appendChild(toggle);
-        } else {
-          const spacer = document.createElement("span");
-          spacer.className = "dept-spacer";
-          spacer.innerHTML = `
-                        <svg width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0.720256 0.999742C0.979771 0.740227 1.40046 0.739998 1.66026 0.99923L3.54367 2.87854C3.93401 3.26803 4.56599 3.26803 4.95634 2.87854L6.83975 0.99923C7.09954 0.739998 7.52023 0.740227 7.77974 0.999742C8.03946 1.25946 8.03946 1.68054 7.77974 1.94025L4.95711 4.76289C4.56658 5.15342 3.93342 5.15342 3.54289 4.76289L0.720256 1.94025C0.46054 1.68054 0.460541 1.25946 0.720256 0.999742Z" fill="transparent"/>
-                        </svg>
-                    `;
-          deptContent.appendChild(spacer);
-        }
+        } 
+        
 
         const nameSpan = document.createElement("span");
         nameSpan.className = "dept-name";
