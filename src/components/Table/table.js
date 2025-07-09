@@ -1,6 +1,6 @@
 export function renderTable(containerId = "table-wrapper") {
   // Удаляем предыдущую таблицу
-  const existingTable = document.getElementById('department-table-container');
+  const existingTable = document.getElementById("department-table-container");
   if (existingTable) existingTable.remove();
 
   const container = document.getElementById(containerId);
@@ -10,14 +10,14 @@ export function renderTable(containerId = "table-wrapper") {
   }
 
   // Создаем контейнер для таблицы
-  const tableContainer = document.createElement('div');
-  tableContainer.id = 'department-table-container';
+  const tableContainer = document.createElement("div");
+  tableContainer.id = "department-table-container";
   container.appendChild(tableContainer);
 
-  const table = document.createElement('table');
-  table.className = 'department-table';
-  const thead = document.createElement('thead');
-  const tbody = document.createElement('tbody');
+  const table = document.createElement("table");
+  table.className = "department-table";
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
   table.append(thead, tbody);
   tableContainer.appendChild(table);
 
@@ -25,35 +25,44 @@ export function renderTable(containerId = "table-wrapper") {
   let currentState = {
     month: new Date().getMonth(),
     year: new Date().getFullYear(),
+    departmentId: null,
     departments: [],
-    expandedDepartments: new Set()
+    expandedDepartments: new Set(),
   };
 
   // Обработчик события изменения даты из header
-  document.addEventListener('dateChanged', (e) => {
-    const { month, year } = e.detail;
+  document.addEventListener("dateChanged", (e) => {
+    const { month, year, departmentId } = e.detail;
     currentState.month = month;
     currentState.year = year;
+    currentState.departmentId = departmentId || null;
     currentState.expandedDepartments = new Set(); // Сбрасываем раскрытые отделы
     updateTable();
   });
 
   const apiService = {
-    async getDepartmentData(year, month) {
+    async getDepartmentData(year, month, departmentId = null) {
       try {
-        const response = await fetch(`https://igpr25.tw1.ru/api/departments?year=${year}&month=${month}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        let url = `https://igpr25.tw1.ru/api/departments?year=${year}&month=${month}`;
+        if (departmentId) {
+          url += `&department_id=${departmentId}`;
+        }
+
+        const response = await fetch(url);
+
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
         return await response.json();
       } catch (error) {
-        console.error('Error fetching department data:', error);
+        console.error("Error fetching department data:", error);
         tableContainer.innerHTML = `<div class="error">Ошибка загрузки данных: ${error.message}</div>`;
         throw error;
       }
-    }
+    },
   };
 
-  function transformApiData(apiData, daysInMonth) {
-    if (!apiData || typeof apiData !== 'object') return [];
+  function transformApiData(apiData, daysInMonth, year, month) {
+    if (!apiData || typeof apiData !== "object") return [];
 
     const departments = [];
     const departmentMap = {};
@@ -69,23 +78,47 @@ export function renderTable(containerId = "table-wrapper") {
         employees: [],
         subDepartments: [],
         hasChildren: false,
-        toggleId: `dept-${node.id}`
+        toggleId: `dept-${node.id}`,
       };
 
       if (Array.isArray(node.users)) {
-        department.employees = node.users.map(user => ({
-          id: user.id,
-          name: user.name,
-          dailyHours: user.daily_workload_hours || 0,
-          scores: Array(daysInMonth).fill(user.daily_workload_hours || 0)
-        }));
+        department.employees = node.users.map((user) => {
+          // Создаём массив часов по дням месяца, заполняем 0
+          const scores = [];
+
+          for (let day = 1; day <= daysInMonth; day++) {
+            // Формируем дату в формате YYYY-MM-DD
+            const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(
+              day
+            ).padStart(2, "0")}`;
+
+            // Получаем часы нагрузки по дате или 0, если нет
+            const hours =
+              user.daily_load_details && user.daily_load_details[dateKey]
+                ? user.daily_load_details[dateKey]
+                : 0;
+
+            scores.push(hours);
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            totalTaskHours: user.total_task_hours || 0,
+            scores,
+          };
+        });
       }
 
-      if (node.children && typeof node.children === 'object') {
+      if (node.children && typeof node.children === "object") {
         department.hasChildren = Object.keys(node.children).length > 0;
 
         for (const childId in node.children) {
-          const childDept = buildDepartment(node.children[childId], node.id, level + 1);
+          const childDept = buildDepartment(
+            node.children[childId],
+            node.id,
+            level + 1
+          );
           if (childDept) {
             department.subDepartments.push(childDept);
           }
@@ -110,34 +143,49 @@ export function renderTable(containerId = "table-wrapper") {
 
   async function updateTable() {
     try {
-      const daysInMonth = new Date(currentState.year, currentState.month + 1, 0).getDate();
-      const apiData = await apiService.getDepartmentData(currentState.year, currentState.month + 1);
-      currentState.departments = transformApiData(apiData, daysInMonth);
+      const daysInMonth = new Date(
+        currentState.year,
+        currentState.month + 1,
+        0
+      ).getDate();
+      const apiData = await apiService.getDepartmentData(
+        currentState.year,
+        currentState.month + 1,
+        currentState.departmentId // 🔹 передаём
+      );
+      currentState.departments = transformApiData(
+        apiData,
+        daysInMonth,
+        currentState.year,
+        currentState.month + 1
+      );
+      console.log("Итоговая структура departments:", currentState.departments);
 
       updateTableHeader(daysInMonth);
       updateTableBody();
     } catch (error) {
-      console.error('Error updating table:', error);
+      console.error("Error updating table:", error);
     }
   }
 
   function updateTableHeader(daysCount) {
-    thead.innerHTML = '';
-    const headerRow = document.createElement('tr');
+    thead.innerHTML = "";
+    const headerRow = document.createElement("tr");
 
-    const nameTh = document.createElement('th');
+    const nameTh = document.createElement("th");
     nameTh.textContent = "Отдел / Сотрудник";
     headerRow.appendChild(nameTh);
 
     for (let day = 1; day <= daysCount; day++) {
-      const dayTh = document.createElement('th');
+      const dayTh = document.createElement("th");
       dayTh.textContent = day;
       const date = new Date(currentState.year, currentState.month, day);
-      if (date.getDay() === 0 || date.getDay() === 6) dayTh.classList.add('weekend');
+      if (date.getDay() === 0 || date.getDay() === 6)
+        dayTh.classList.add("weekend");
       headerRow.appendChild(dayTh);
     }
 
-    const totalTh = document.createElement('th');
+    const totalTh = document.createElement("th");
     totalTh.textContent = "Итого";
     headerRow.appendChild(totalTh);
 
@@ -146,7 +194,7 @@ export function renderTable(containerId = "table-wrapper") {
 
   function createToggleIcon(expanded = false) {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("class", `toggle-icon ${expanded ? 'expanded' : ''}`);
+    svg.setAttribute("class", `toggle-icon ${expanded ? "expanded" : ""}`);
     svg.setAttribute("width", "16");
     svg.setAttribute("height", "16");
     svg.setAttribute("viewBox", "0 0 16 16");
@@ -162,7 +210,9 @@ export function renderTable(containerId = "table-wrapper") {
 
   function createDepartmentRow(department) {
     const tr = document.createElement("tr");
-    tr.className = `department-row ${department.level === 0 ? "main-department" : "sub-department"}`;
+    tr.className = `department-row ${
+      department.level === 0 ? "main-department" : "sub-department"
+    }`;
     tr.dataset.toggleId = department.toggleId;
 
     const nameTd = document.createElement("td");
@@ -171,7 +221,11 @@ export function renderTable(containerId = "table-wrapper") {
     div.style.paddingLeft = `${department.level * 20}px`;
 
     if (department.hasChildren) {
-      div.appendChild(createToggleIcon(currentState.expandedDepartments.has(department.toggleId)));
+      div.appendChild(
+        createToggleIcon(
+          currentState.expandedDepartments.has(department.toggleId)
+        )
+      );
       div.style.cursor = "pointer";
     } else {
       const spacer = document.createElement("span");
@@ -184,7 +238,11 @@ export function renderTable(containerId = "table-wrapper") {
     nameTd.appendChild(div);
     tr.appendChild(nameTd);
 
-    const daysInMonth = new Date(currentState.year, currentState.month + 1, 0).getDate();
+    const daysInMonth = new Date(
+      currentState.year,
+      currentState.month + 1,
+      0
+    ).getDate();
     for (let i = 0; i < daysInMonth; i++) {
       tr.appendChild(document.createElement("td"));
     }
@@ -199,46 +257,53 @@ export function renderTable(containerId = "table-wrapper") {
   function createEmployeeRow(employee, department) {
     const tr = document.createElement("tr");
     tr.className = "employee-row";
-    tr.style.display = currentState.expandedDepartments.has(department.toggleId) ? "" : "none";
+    tr.style.display = currentState.expandedDepartments.has(department.toggleId)
+      ? ""
+      : "none";
 
     const nameTd = document.createElement("td");
     nameTd.style.paddingLeft = `${(department.level + 1) * 30}px`;
     nameTd.textContent = employee.name;
     tr.appendChild(nameTd);
 
-    employee.scores.forEach(score => {
+    employee.scores.forEach((score) => {
       const td = document.createElement("td");
-      td.textContent = score > 0 ? score.toFixed(2) : "-";
+      td.textContent = score > 0 ? score.toFixed(2) : "";
       tr.appendChild(td);
     });
 
     const totalTd = document.createElement("td");
-    totalTd.textContent = employee.scores.reduce((sum, score) => sum + score, 0).toFixed(2);
+    totalTd.textContent = employee.scores
+      .reduce((sum, score) => sum + score, 0)
+      .toFixed(2);
     tr.appendChild(totalTd);
 
     return tr;
   }
 
   function calculateDepartmentTotal(department) {
-    let total = department.employees.reduce((sum, emp) => sum + emp.scores.reduce((s, score) => s + score, 0), 0);
-    department.subDepartments.forEach(subDept => {
+    let total = department.employees.reduce(
+      (sum, emp) => sum + emp.scores.reduce((s, score) => s + score, 0),
+      0
+    );
+    department.subDepartments.forEach((subDept) => {
       total += calculateDepartmentTotal(subDept);
     });
     return total;
   }
 
   function updateTableBody() {
-    tbody.innerHTML = '';
+    tbody.innerHTML = "";
 
     function renderDepartment(department) {
       tbody.appendChild(createDepartmentRow(department));
 
       if (currentState.expandedDepartments.has(department.toggleId)) {
-        department.subDepartments.forEach(subDept => {
+        department.subDepartments.forEach((subDept) => {
           renderDepartment(subDept);
         });
 
-        department.employees.forEach(emp => {
+        department.employees.forEach((emp) => {
           tbody.appendChild(createEmployeeRow(emp, department));
         });
       }
@@ -249,7 +314,7 @@ export function renderTable(containerId = "table-wrapper") {
   }
 
   function setupTableToggles() {
-    document.querySelectorAll(".department-row").forEach(row => {
+    document.querySelectorAll(".department-row").forEach((row) => {
       const toggleId = row.dataset.toggleId;
       const toggleIcon = row.querySelector(".toggle-icon");
 
@@ -269,9 +334,9 @@ export function renderTable(containerId = "table-wrapper") {
   }
 
   // Стили
-  if (!document.getElementById('department-table-styles')) {
+  if (!document.getElementById("department-table-styles")) {
     const style = document.createElement("style");
-    style.id = 'department-table-styles';
+    style.id = "department-table-styles";
     style.textContent = `
       .department-table {
         width: 100%;
