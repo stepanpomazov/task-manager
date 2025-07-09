@@ -61,7 +61,8 @@ export async function renderHeader(containerId = "header-container") {
   // 3. Блок выбора года
   const yearGroup = createYearSelect();
   // 4. Блок выбора отдела
-  const departmentGroup = await createDepartmentSelect();
+  const { departmentGroup } = await createDepartmentSelect();
+  document.body.appendChild(departmentGroup);
   // 5. Блок кнопок мониторинга
   const monitorLabel = createMonitorButtons();
   // 6. Кнопка "Показать"
@@ -174,7 +175,6 @@ function createMonthSelect() {
     monthPopup.style.display =
       monthPopup.style.display === "none" ? "block" : "none";
     const icon = monthTrigger.querySelector(".month-trigger-icon");
-    ic;
     icon.style.transform =
       monthPopup.style.display === "block" ? "rotate(180deg)" : "rotate(0)";
   });
@@ -263,7 +263,7 @@ function createYearSelect() {
 }
 
 // Компонент выбора отдела
-async function createDepartmentSelect() {
+async function createDepartmentSelect(currentState) {
   const departmentGroup = document.createElement("label");
   departmentGroup.className = "department-group";
   departmentGroup.style.display = "flex";
@@ -327,8 +327,7 @@ async function createDepartmentSelect() {
                     `;
           toggle.style.transform = "rotate(-90deg)";
           deptContent.appendChild(toggle);
-        } 
-        
+        }
 
         const nameSpan = document.createElement("span");
         nameSpan.className = "dept-name";
@@ -396,7 +395,7 @@ async function createDepartmentSelect() {
     }
   });
 
-  return departmentGroup;
+  return { departmentGroup, deptTrigger, deptPopup };
 }
 
 // Компонент кнопок мониторинга
@@ -444,9 +443,12 @@ function createShowButton(monthSelect, yearInput) {
   showButton.addEventListener("click", () => {
     const month = parseInt(monthSelect.value) - 1; // 0-11
     const year = parseInt(yearInput.value);
+    // Получаем выбранный id отдела из DOM, если он есть
+    const deptTrigger = document.querySelector(".dept-trigger");
+    const departmentId = deptTrigger ? deptTrigger.dataset.id || null : null;
 
     const event = new CustomEvent("dateChanged", {
-      detail: { month, year },
+      detail: { month, year, departmentId },
     });
     document.dispatchEvent(event);
   });
