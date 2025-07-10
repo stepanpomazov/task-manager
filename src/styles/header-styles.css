@@ -13,12 +13,25 @@
 .form-row {
   display: flex;
   align-items: center;
+  gap: 4px;
+  font-weight: bold;
+}
+
+.header-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-right {
+  display: flex;
   flex-wrap: wrap;
   gap: 16px;
 }
 
 .form-row label {
   display: flex;
+  flex-wrap: wrap; /* если нужно переносить строки на малых экранах */
   align-items: center;
   gap: 8px;
   font-weight: bold;
@@ -176,6 +189,7 @@
   background-color: #f3f3f3;
   border-radius: 12px;
   cursor: pointer;
+  width: 180px; /* фиксированная ширина! */
   min-width: 180px;
   font-weight: 100;
   font-size: 14px;
@@ -185,6 +199,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.dept-trigger-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 6px; /* небольшой отступ от стрелки */
 }
 
 .dept-trigger:hover {

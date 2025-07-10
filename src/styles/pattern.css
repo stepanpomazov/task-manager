@@ -1,0 +1,17 @@
+.waves-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.waves-background {
+  width: 180%;
+  height: 100%;
+  object-fit: cover; /* Чтобы SVG растягивалось на всю область */
+  min-width: 100vw;
+  min-height: 100vh;
+}
