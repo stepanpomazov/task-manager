@@ -66,6 +66,8 @@ export function renderTable(containerId = "table-wrapper") {
 
     const departments = [];
     const departmentMap = {};
+    // Глобальный объект для отслеживания учтенных сотрудников
+    const processedEmployees = new Set();
 
     function buildDepartment(node, parentId = null, level = 0) {
       if (!node || !node.id) return null;
@@ -79,6 +81,7 @@ export function renderTable(containerId = "table-wrapper") {
         subDepartments: [],
         hasChildren: false,
         toggleId: `dept-${node.id}`,
+        dailySummary: Array(daysInMonth).fill(0), // Массив суммарных часов по дням
       };
 
       if (Array.isArray(node.users)) {
@@ -87,19 +90,28 @@ export function renderTable(containerId = "table-wrapper") {
           const scores = [];
 
           for (let day = 1; day <= daysInMonth; day++) {
-            // Формируем дату в формате YYYY-MM-DD
             const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(
               day
             ).padStart(2, "0")}`;
-
-            // Получаем часы нагрузки по дате или 0, если нет
-            const hours =
-              user.daily_load_details && user.daily_load_details[dateKey]
-                ? user.daily_load_details[dateKey]
-                : 0;
-
+            const hours = user.daily_load_details?.[dateKey] ?? 0;
             scores.push(hours);
           }
+
+          // Добавляем часы сотрудника в этот отдел всегда:
+          for (let day = 1; day <= daysInMonth; day++) {
+            department.dailySummary[day - 1] += scores[day - 1];
+          }
+
+          if (processedEmployees.has(user.id)) {
+            department.excludeFromParentSummary =
+              department.excludeFromParentSummary || new Set();
+            department.excludeFromParentSummary.add(user.id);
+          } else {
+            processedEmployees.add(user.id);
+          }
+
+          // Помечаем сотрудника как обработанного
+          // processedEmployees.add(user.id);
 
           return {
             id: user.id,
@@ -121,6 +133,22 @@ export function renderTable(containerId = "table-wrapper") {
           );
           if (childDept) {
             department.subDepartments.push(childDept);
+            // ➕ Добавляем итог дочернего департамента в родительский
+            childDept.dailySummary.forEach((childHours, index) => {
+              // Если в дочке не было исключений — добавляем как есть
+              department.dailySummary[index] += childHours;
+            });
+
+            // Убираем дублирующихся сотрудников из родительского summary
+            if (childDept.excludeFromParentSummary) {
+              childDept.employees.forEach((emp) => {
+                if (childDept.excludeFromParentSummary.has(emp.id)) {
+                  emp.scores.forEach((score, index) => {
+                    department.dailySummary[index] -= score;
+                  });
+                }
+              });
+            }
           }
         }
       }
@@ -174,7 +202,7 @@ export function renderTable(containerId = "table-wrapper") {
 
     const nameTh = document.createElement("th");
     nameTh.textContent = "Отдел / Сотрудник";
-    nameTh.style.textAlign = "left"; 
+    nameTh.style.textAlign = "left";
     headerRow.appendChild(nameTh);
 
     for (let day = 1; day <= daysCount; day++) {
@@ -217,7 +245,7 @@ export function renderTable(containerId = "table-wrapper") {
     tr.dataset.toggleId = department.toggleId;
 
     const nameTd = document.createElement("td");
-    nameTd.style.textAlign = "left";     
+    nameTd.style.textAlign = "left";
     const div = document.createElement("div");
     div.className = "cell-content";
     div.style.paddingLeft = `${department.level * 16}px`;
@@ -245,9 +273,17 @@ export function renderTable(containerId = "table-wrapper") {
       currentState.month + 1,
       0
     ).getDate();
+
     for (let i = 0; i < daysInMonth; i++) {
-      tr.appendChild(document.createElement("td"));
+      const td = document.createElement("td");
+      const hours = department.dailySummary?.[i] || 0;
+      td.textContent = hours > 0 ? hours.toFixed(2) : "";
+      tr.appendChild(td);
     }
+
+    // for (let i = 0; i < daysInMonth; i++) {
+    //   tr.appendChild(document.createElement("td"));
+    // }
 
     const totalTd = document.createElement("td");
     totalTd.textContent = calculateDepartmentTotal(department).toFixed(2);
@@ -334,8 +370,6 @@ export function renderTable(containerId = "table-wrapper") {
       }
     });
   }
-
-
 
   // Инициализация таблицы
   updateTable();
