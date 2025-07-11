@@ -174,6 +174,7 @@ export function renderTable(containerId = "table-wrapper") {
 
     const nameTh = document.createElement("th");
     nameTh.textContent = "Отдел / Сотрудник";
+    nameTh.style.textAlign = "left"; 
     headerRow.appendChild(nameTh);
 
     for (let day = 1; day <= daysCount; day++) {
@@ -216,11 +217,12 @@ export function renderTable(containerId = "table-wrapper") {
     tr.dataset.toggleId = department.toggleId;
 
     const nameTd = document.createElement("td");
+    nameTd.style.textAlign = "left";     
     const div = document.createElement("div");
     div.className = "cell-content";
-    div.style.paddingLeft = `${department.level * 20}px`;
+    div.style.paddingLeft = `${department.level * 16}px`;
 
-    if (department.hasChildren) {
+    if (department) {
       div.appendChild(
         createToggleIcon(
           currentState.expandedDepartments.has(department.toggleId)
@@ -333,58 +335,7 @@ export function renderTable(containerId = "table-wrapper") {
     });
   }
 
-  // Стили
-  if (!document.getElementById("department-table-styles")) {
-    const style = document.createElement("style");
-    style.id = "department-table-styles";
-    style.textContent = `
-      .department-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: Arial, sans-serif;
-      }
-      .department-table th, .department-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-      }
-      .department-table th {
-        background-color: #f2f2f2;
-        position: sticky;
-        top: 0;
-      }
-      .toggle-icon {
-        transition: transform 0.2s;
-        margin-right: 5px;
-      }
-      .toggle-icon.expanded {
-        transform: rotate(90deg);
-      }
-      .main-department {
-        background-color: #e6f2ff;
-        font-weight: bold;
-      }
-      .sub-department {
-        background-color: #f0f7ff;
-      }
-      .employee-row {
-        background-color: #fff;
-      }
-      .cell-content {
-        display: flex;
-        align-items: center;
-      }
-      .weekend {
-        background-color: #ffecec;
-      }
-      .error {
-        color: red;
-        padding: 20px;
-        text-align: center;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+
 
   // Инициализация таблицы
   updateTable();

@@ -1,168 +1,196 @@
 :root {
-    --color-white: #ffffff;
-    --color-black: #333333;
-    --color-light-gray: #f5f5f5;
-    --color-gray: #e4e4e4;
-    --color-dark-gray: #e0e0e0;
-    --color-blue: #1e41ff;
-    --color-light-blue: #eaf2ff;
-    --color-hover: #f9f9f9;
+  /* Цвета */
+  --color-white: #ffffff;
+  --color-black: #333333;
+  --color-light-gray: #f5f5f5;
+  --color-gray: #F5F5F5;
+  --color-dark-gray: #e0e0e0;
+  --color-blue: #1e41ff;
+  --color-light-blue: #eaf2ff;
+  --color-hover: #f9f9f9;
+  --color-weekend: #ffecec;
+  --color-error: #ff0000;
+  --color-header-bg: #ffffff;
+  --color-main-department: #EAF2FF;
+  --color-sub-department: #F5F5F5;
 
-    --table-min-width: 1440px;
-    --column-main-width: 200px;
-    --column-data-width: 50px;
-    --border-radius: 14px;
-    --border-width: 1px;
-    --border-accent-width: 5px;
+  /* Размеры */
+  --table-min-width: 1440px;
+  --column-main-width: 200px;
+  --column-data-width: 50px;
+  --border-radius: 14px;
+  --border-width: 0.5px;;
+  --border-accent-width: 5px;
 
-    --padding-small: 6px 8px;
-    --padding-medium: 8px 8px;
-    --padding-large: 10px 8px;
-    --padding-extra: 16px;
+  /* Отступы */
+  --padding-small: 6px 8px;
+  --padding-medium: 8px 8px;
+  --padding-large: 10px 8px;
+  --padding-extra: 16px;
+  --padding-indent: 24px;
+  --padding-sub-indent: 30px;
 
-    --font-weight-normal: 600;
-    --font-weight-bold: 650;
-    --font-weight-header: 700;
+  /* Шрифты */
+  --font-weight-normal: 600;
+  --font-weight-bold: 650;
+  --font-weight-header: 700;
 }
 
-#table-wrapper {
-    overflow-x: auto;
-    max-width: 100%;
-    margin-top: var(--padding-extra);
-}
-
-table {
-    min-width: var(--table-min-width);
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background-color: var(--color-white);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    table-layout: fixed;
-}
-
-thead {
-    background-color: var(--color-white);
-}
-
-thead tr {
-    background-color: var(--color-white);
-}
-
-thead th {
-    padding: var(--padding-large);
-    text-align: left;
-    font-weight: var(--font-weight-header);
-    color: var(--color-black);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-tbody td {
-    padding: var(--padding-medium);
-    border-bottom: var(--border-width) solid var(--color-dark-gray);
-    vertical-align: middle;
-    font-weight: var(--font-weight-normal);
-}
-
-td:first-child,
-th:first-child {
-    width: var(--column-main-width);
-    min-width: var(--column-main-width);
-    padding-left: var(--padding-extra);
-}
-
-td:not(:first-child),
-th:not(:first-child) {
-    width: var(--column-data-width);
-    min-width: var(--column-data-width);
-    max-width: var(--column-data-width);
-    text-align: left;
-}
-
-/* Стили отделов */
-.main-department {
-    background-color: var(--color-light-blue);
-}
-
-.main-department td {
-    background-color: inherit;
-    cursor: pointer;
-    border: none;
-    font-weight: var(--font-weight-bold);
-    padding: var(--padding-medium);
-}
-
-.top-level td:first-child {
-    border-left: var(--border-accent-width) solid var(--color-blue);
-}
-
-.sub-department {
-    background-color: var(--color-light-gray);
-}
-
-.sub-department td {
-    background-color: inherit;
-    padding-left: 30px;
-    cursor: pointer;
-    border: none;
-    font-weight: var(--font-weight-normal);
-    border-bottom: var(--border-width) solid var(--color-gray);
-}
-
-.employee td,
-.employee-nested td {
-    padding: var(--padding-medium);
-    text-align: left;
-    font-weight: var(--font-weight-normal);
-    background-color: var(--color-white);
-    border-bottom: var(--border-width) solid var(--color-gray);
-    cursor: pointer;
-}
-
-.name-indent {
-    padding-left: 24px;
-}
-
-.employee-nested .name-indent {
-    padding-left: 46px;
-}
-
-.cell-content {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.toggle-icon {
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
-}
-
-.toggle-icon.rotated {
-    transform: rotate(90deg);
-}
-
-.hidden {
-    display: none;
-}
-
-tr:last-child td {
-    border-bottom: none;
-}
-
-tr:hover td {
-    background-color: var(--color-hover);
-}
-
+/* Базовые стили */
 .container {
-    padding: var(--padding-extra);
+  padding: var(--padding-extra);
 }
 
 hr {
-    margin: var(--padding-extra) 0;
-    border: none;
-    border-top: var(--border-width) solid var(--color-dark-gray);
+  margin: var(--padding-extra) 0;
+  border: none;
+  border-top: var(--border-width) solid var(--color-dark-gray);
+}
+
+/* Стили таблицы */
+#table-wrapper,
+.table-container {
+  overflow-x: auto;
+  max-width: 100%;
+  margin-top: var(--padding-extra);
+  position: relative;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 20px;
+}
+
+.department-table {
+  min-width: var(--table-min-width);
+  width: 100%;
+  border-spacing: 0;
+  /* border-collapse: collapse; */
+  font-family: Arial, sans-serif;
+  table-layout: fixed;
+  position: relative;
+}
+
+
+/* Стили ячеек */
+.department-table th,
+.department-table td {
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  border: 0.5px solid #ebebeb;
+  padding: var(--padding-medium);
+  text-align: center;
+  vertical-align: middle;
+  font-weight: var(--font-weight-normal);
+  border: var(--border-width) solid #ebebeb;
+  position: relative;
+}
+
+/* Рамки ТОЛЬКО для строк сотрудников */
+.department-table tr.employee-row td {
+  border: var(--border-width) solid #ebebeb;
+}
+
+.department-table td:first-child,
+.department-table th:first-child {
+  width: var(--column-main-width);
+  min-width: var(--column-main-width);
+  padding-left: var(--padding-extra);
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-clip: padding-box;
+}
+
+.department-table td:not(:first-child),
+.department-table th:not(:first-child) {
+  width: var(--column-data-width);
+  min-width: var(--column-data-width);
+  max-width: var(--column-data-width);
+  text-align: left;
+}
+
+/* Стили заголовков */
+.department-table th {
+  background-color: var(--color-header-bg);
+  position: sticky;
+  top: 0;
+  font-weight: var(--font-weight-header);
+  border: var(--border-width) solid #ebebeb; /* Рамки для заголовков */
+}
+
+.department-table thead th:first-child {
+  z-index: 3;
+  box-shadow: 1px 0 0 0 var(--color-dark-gray) inset;
+}
+
+/* Стили строк */
+.main-department {
+  background-color: var(--color-main-department);
+  font-weight: var(--font-weight-bold);
+}
+
+.sub-department td {
+  background-color: var(--color-sub-department);
+  cursor: pointer;
+  border-bottom: var(--border-width) solid #ebebeb;
+}
+
+.employee-row {
+  background-color: var(--color-white);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--color-hover);
+}
+
+/* Специфичные стили первого столбца */
+.department-table tr.main-department td:first-child {
+  background-color: var(--color-main-department);
+}
+
+.department-table tr.sub-department td:first-child {
+  background-color: var(--color-sub-department);
+}
+
+.department-table tr.employee-row td:first-child {
+  background-color: var(--color-white);
+}
+
+/* Дополнительные элементы */
+.toggle-icon {
+  transition: transform 0.2s;
+  margin-right: 8px;
+  width: 16px;  /* Фиксированная ширина */
+  height: 16px; /* Фиксированная высота */
+  min-width: 16px; /* Запрет на уменьшение */
+  flex-shrink: 0; /* Запрет сжатия в flex-контейнере */
+}
+
+.toggle-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.cell-content {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.name-indent {
+  padding-left: var(--padding-indent);
+}
+
+.weekend {
+  background-color: var(--color-weekend);
+}
+
+.error {
+  color: var(--color-error);
+  padding: 20px;
+  text-align: center;
 }
