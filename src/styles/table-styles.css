@@ -73,6 +73,10 @@ hr {
 /* Стили ячеек */
 .department-table th,
 .department-table td {
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   border: 0.5px solid #ebebeb;
   padding: var(--padding-medium);
   text-align: center;

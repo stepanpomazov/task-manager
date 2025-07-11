@@ -222,7 +222,7 @@ export function renderTable(containerId = "table-wrapper") {
     div.className = "cell-content";
     div.style.paddingLeft = `${department.level * 16}px`;
 
-    if (department.hasChildren) {
+    if (department) {
       div.appendChild(
         createToggleIcon(
           currentState.expandedDepartments.has(department.toggleId)

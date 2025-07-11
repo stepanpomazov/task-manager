@@ -79,7 +79,7 @@ export async function renderHeader(containerId = "header-container") {
 
   const headerRight = document.createElement("div");
   headerRight.className = "header-right";
-  headerRight.appendChild(monitorLabel);
+  // headerRight.appendChild(monitorLabel);
   headerRight.appendChild(showButton);
 
   const menuContainer = document.createElement("div");
